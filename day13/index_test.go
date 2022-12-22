@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDefault(t *testing.T) {
+func TestBuildNodes(t *testing.T) {
 	var nodeObj node
 	var list []*node
 
@@ -49,7 +49,53 @@ func TestDefault(t *testing.T) {
 		t.Fatalf("TEST default :: expected:1. actual:%v", len(list))
 	}
 
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[1,2,3]", 0, &nodeObj)
+	list = nodeObj.indices[0].indices
+	if len(list) != 3 {
+		fmt.Printf("%+v\n", nodeObj.indices[0])
+		t.Fatalf("TEST default :: expected:3. actual:%v", len(list))
+	}
+
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[1,[11,22],3]", 0, &nodeObj)
+	list = nodeObj.indices[0].indices
+	if len(list) != 3 {
+		fmt.Printf("%+v\n", nodeObj.indices[0])
+		t.Fatalf("TEST default :: expected:3. actual:%v", len(list))
+	}
+
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[[11,22],3,4]", 0, &nodeObj)
+	list = nodeObj.indices[0].indices
+	if len(list) != 3 {
+		fmt.Printf("%+v\n", nodeObj.indices[0])
+		t.Fatalf("TEST default :: expected:3. actual:%v", len(list))
+	}
+
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[]", 0, &nodeObj)
+	list = nodeObj.indices[0].indices
+	if len(list) != 0 {
+		fmt.Printf("%+v\n", nodeObj.indices[0])
+		t.Fatalf("TEST default :: expected:0. actual:%v", len(list))
+	}
+
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[[[]]]", 0, &nodeObj)
+	list = nodeObj.indices[0].indices
+	if len(list) != 1 {
+		fmt.Printf("%+v\n", nodeObj.indices[0])
+		t.Fatalf("TEST default :: expected:1. actual:%v", len(list))
+	}
+}
+
+func TestGetIndex(t *testing.T) {
+	var nodeObj node
+	var list []*node
+
 	var index int
+	var expected int
 	var list1 *node
 	var list2 *node
 
@@ -116,6 +162,20 @@ func TestDefault(t *testing.T) {
 		fmt.Printf("%+v\n", list1)
 		fmt.Printf("%+v\n", list2)
 		t.Fatalf("TEST default :: expected:0. actual:%v", len(list))
+	}
+
+	expected = 2
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[[1],[2,3,4]]", 0, &nodeObj)
+	list1 = nodeObj.indices[0]
+	nodeObj = node{indices: make([]*node, 0)}
+	buildNodes("[[1],[4]]", 0, &nodeObj)
+	list2 = nodeObj.indices[0]
+	index = getIndex(list1, list2)
+	if index != expected {
+		fmt.Printf("%+v\n", list1)
+		fmt.Printf("%+v\n", list2)
+		t.Fatalf("TEST default :: expected:%v. actual:%v", expected, len(list))
 	}
 }
 
